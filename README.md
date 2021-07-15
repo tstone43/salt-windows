@@ -37,7 +37,7 @@
 ```sudo salt-key -A```
 - I only want to accept a certain key just for learning purposes, so I will run this:
 
-```sudo salt-key -a salt-dc01
+```sudo salt-key -a salt-dc01```
 - Run the following command from the Master to see if you can the agent version from Minion:
 
 ```sudo salt salt-dc01 test.version```
@@ -47,7 +47,7 @@
 - Grains in Salt is similar to what Facts is in Ansible.  Grains store detail about the system you're managing.
 - The following command will list the grains and their associated data:
 
-```salt '*' grains.items
+```salt '*' grains.items```
 - 
 
 
