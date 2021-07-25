@@ -48,6 +48,25 @@
 - The following command will list the grains and their associated data:
 
 ```salt '*' grains.items```
-- 
+- If you want to see the IP address of the Windows Minion you could do this:
+
+```sudo salt salt-dc01 cmd.run 'ipconfig /all'```
+- Lets say you want to target based off whether the Minion is Windows.  You could use grains like this:
+
+```sudo salt -G 'os:Windows' test.ping```
+
+### Working with Salt States
+- On the Windows Minion I had to open the config file at C:\salt\conf\minion and add to lines as follows to end of file:
+
+```use_superseded:
+     - module.run
+```
+- This previous configuration was necessary to be able to use the new syntax format for module.run that was used in win_enable_administrator state file.     
+
+### Useful Commands for Salt
+- To retrieve a list of the various state functions do this:
+
+```sudo salt '*' sys.list_functions```
+
 
 
