@@ -57,8 +57,8 @@
 
 ### Working with Salt States
 - On the Windows Minion I had to open the config file at C:\salt\conf\minion and add to lines as follows to end of file:
-
-```use_superseded:
+```
+use_superseded:
      - module.run```
 - This previous configuration was necessary to be able to use the new syntax format for module.run that was used in win_enable_administrator state file.     
 
