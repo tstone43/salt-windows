@@ -60,7 +60,10 @@
 
 <p>use_superseded:<br>
      - module.run</p>
-- This previous configuration was necessary to be able to use the new syntax format for module.run that was used in win_enable_administrator state file.     
+- This previous configuration was necessary to be able to use the new syntax format for module.run that was used in win_enable_administrator state file.  Note that - module.run has a 2 space indent that I couldn't show with Markdown
+- The "rename_computer.sls" file under the saltstack/salt directory in this repo is known as a State file. 
+- Here are some important points about this state file:
+  - test
 
 ### Useful Commands for Salt
 - To retrieve a list of the various state functions do this:
