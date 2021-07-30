@@ -96,8 +96,11 @@
 - The win_enable_administrator file can be executed just as if it was a State:
 
 ```sudo salt salt-dc01 state.apply win_enable_administrator```
+- The next State file is win_server_features, which will install the AD-Domain-Servers and DNS features
+- If you want to see what features are available to install on a Minion you can run this:
 
-
+```sudo salt salt-dc01 win_servermanager.list_available```
+- Note that Salt requires the short name of the role, which is returned in right column of previous command
 
 ### Useful Commands for Salt
 - To retrieve a list of the various state functions do this:
