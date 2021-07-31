@@ -62,6 +62,7 @@
      - module.run</p>
 
 - This previous configuration was necessary to be able to use the new syntax format for module.run that was used in win_enable_administrator state file.  Note that "- module.run" has a 2 space indent that I couldn't show with Markdown
+- I ended up writing a state file to make the change in the C:\salt\conf\minion file.  State file is "module_run_config.sls".  This file will also restart the salt-minion service in Windows once the minion file is updated.
 - The "rename_computer.sls" file under the saltstack/salt directory in this repo is known as a State file. 
 - Here are some important points about this state file:
   - The 1st line in the State file is the ID: rename_computer, which is a name you could reference to call this State file from another file such as a "top.sls" file.
