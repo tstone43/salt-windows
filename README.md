@@ -38,6 +38,9 @@
 - I only want to accept a certain key just for learning purposes, so I will run this:
 
 ```sudo salt-key -a salt-dc01```
+- If you want to remove a key you can run something like this:
+
+```sudo salt-key -d salt-dc01```
 - Run the following command from the Master to see if you can the agent version from Minion:
 
 ```sudo salt salt-dc01 test.version```
@@ -71,7 +74,7 @@
   - The 4th line here is an ID of "reboot_computer"
   - In the 5th line I'm using the "system" State once again, but this time using the "reboot" function.
   - Lines 6-8 are attributes for the reboot function
-- The win_set_ip_address.sls, the win_timezone.sls, and win_updates.sls are additional State files.
+- The win_set_ip_address.sls, the win_timezone.sls, and win_updates.sls are additional State files that are named appropriately for what they do
 - Before executing State files on your Master you will need to make sure that your State files exist in the default location on your Master, which is /srv/salt.  I learned the hard way if they are not here they will not execute at all.
 - Here's an example of how to apply a State file to a minion named "salt-dc01":
 
@@ -81,11 +84,12 @@
 - In Salt, Pillars are used to store secrets, file paths, and other common things that would be shared across systems.
 - Since Pillars could have secrets, they shouldn't be stored in the same area as your other State files.  The files related to a Pillar should be stored under /srv/pillar on the Master.
 - In my /srv/pillar directory on my Master, I've created 2 files:
-  - default.sls - has a key value pair in it that helps me define value for "admin_password"
+  - default.sls - has a key value pair in it that helps me define the value for "admin_password"
   - top.sls - helps me specify which hosts will be targeted with key values defined in default.sls file.
 - After you have defined these 2 files above you need to instruct your Minions to refresh the Pillar data just described above:
 
 ```sudo salt '*' saltutil.refresh_pillar```
+- When you run a state against minions they are supposed to automatically refresh the pillar data, so the refresh command above may not be necessary
 - Here's a breakdown of win_enable_administrator.sls:
   - The 1st line again is just the ID: win_enable_administrator
   - The 2nd line is how you call a Salt Module.  
@@ -97,11 +101,28 @@
 - The win_enable_administrator file can be executed just as if it was a State:
 
 ```sudo salt salt-dc01 state.apply win_enable_administrator```
-- The next State file is win_server_features, which will install the AD-Domain-Servers and DNS features
-- If you want to see what features are available to install on a Minion you can run this:
+- The next State file is win_ad_forest_setup, which will install the AD-Domain-Servers and DNS features.  It will also setup the first domain in a forest.
+- If you want to see what Windows Server Roles\Features are available to install on a Minion you can run this:
 
 ```sudo salt salt-dc01 win_servermanager.list_available```
 - Note that Salt requires the short name of the role, which is returned in right column of previous command
+- Here's a breakdown of the win_ad_forest_setup file:
+  - The first portion of this state file will install the DNS Server and AD Domain Services roles
+  - The next portion will run a PowerShell script called "setup_ad_forest.ps1"
+  - Notice that the "setup_ad_forest.ps1" script lives in the same directory as the state files
+  - Next to "source:" you will see it references "salt://" which allows us to access the files in /srv/salt on the Master
+  - "shell:" will be set to PowerShell since that is the type of script I'm calling
+  - "template:" is set to "jinja" because in the PowerShell script "setup_ad_forest.ps1" I'm referencing values from Pillar within the script to pass as values in the script
+  - The "onchanges:" is there, so that the PowerShell script will only run if the DNS Server and AD Domain Services roles are installed
+- Here's a breakdown of the setup_ad_forest.ps1 file:
+  - Notice lines 1-5 in the script are setting up new variables that are referencing values I defined in my Pillar
+  - For example in my Pillar default.sls under /srv/pillar file I have defined "ForestMode: WinThreshold" and "DomainMode: WinThreshold".  I have also defined values for "DomainName", "DomainNetbiosName", "SafeModeAdministratorPassword"
+  - By setting up the variables mentioned above, I can then use these variables in my $Params hash table.
+  - When I call the Install-ADDSForest cmdlet I can pass my parameters and values I've set in my hash table
+  - I've also added the switch parameters for -InstallDns and -Force, which will setup the DNS zone for the domain and also avoid unnecesary confirmation prompts.
+- If you have defined everything necessary in your Pillar files then this state should configure a new domain controller for a new forest with DNS Server installed.  To run this state you run this command:
+
+```sudo salt salt-dc01 state.apply win_ad_forest_setup```
 
 ### Useful Commands for Salt
 - To retrieve a list of the various state functions do this:
